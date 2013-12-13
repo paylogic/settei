@@ -1,8 +1,8 @@
 Settei: Config system which bases on entry points of setuptools
 ===============================================================
 
-The ``settei`` package is a library which gives you possibility to get config settings from entry points and get them
-with specifying application and environment.
+The ``settei`` package is a library which gives you possibility to get config settings from entry points for
+specific application and environment.
 Generic purpose python settings library which uses entry points as a registry.
 
 Introduces terms ``application`` and ``environment``:
@@ -11,6 +11,13 @@ Introduces terms ``application`` and ``environment``:
 
 - ``environment`` is name of entry point
 
+
+.. image:: https://api.travis-ci.org/paylogic/settei.png
+   :target: https://travis-ci.org/paylogic/settei
+.. image:: https://pypip.in/v/settei/badge.png
+   :target: https://crate.io/packages/settei/
+.. image:: https://coveralls.io/repos/paylogic/settei/badge.png?branch=master
+   :target: https://coveralls.io/r/paylogic/settei
 
 Installation
 ------------
@@ -39,6 +46,24 @@ where ``backoffice`` or ``frontoffice`` is your application.
         }
         # ...
     )
+
+The ``generate_config`` function should return instance of ``settei.config.Config`` class.
+
+.. code-block:: python
+
+    def generate_config():
+        config = Config()
+
+        # adding some settings
+        config['ANSWER'] = 42
+
+        # or loading them from object
+        config.from_pyfile('full/path/to/file.py')
+
+        # or from object
+        config.from_object('path.to.object')
+
+        return config
 
 Then you will need to install your package and after it with ``settei`` you will be able to get config settings for your
 application.

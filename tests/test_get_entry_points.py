@@ -24,7 +24,7 @@ class SettingsHandler(object):
 
 def default():
     """Function which is used by entry points for getting settings for default environment."""
-    config = Config('tests/')
+    config = Config()
     config.update({'QUESTION': 'The Ultimate Question of Life, the Universe, and Everything'})
     return config
 
@@ -49,7 +49,7 @@ def settings_from_object_with_path_to_object(default):
 
 def settings_from_envvar(default):
     """Function which is used by entry points for gettings settings from environment variable."""
-    os.environ['path_to_object'] = 'test_get_entry_points.py'
+    os.environ['path_to_object'] = 'tests/test_get_entry_points.py'
     default.from_envvar('path_to_object')
     return default
 
@@ -83,6 +83,7 @@ def get_duplicate_entry_points(group, name=None):
 def require(self, env, installer):
     """Monkeypatched function of EntryPoint class."""
     pass
+
 
 @pytest.fixture
 def config_environment():

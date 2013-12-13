@@ -113,9 +113,8 @@ class Config(dict):
     :param defaults: an optional dictionary of default values
     """
 
-    def __init__(self, root_path, defaults=None):
+    def __init__(self, defaults=None):
         dict.__init__(self, defaults or {})
-        self.root_path = root_path
 
     def from_envvar(self, variable_name, silent=False):
         """Loads a configuration from an environment variable pointing to
@@ -143,13 +142,10 @@ class Config(dict):
         behaves as if the file was imported as module with the
         :meth:`from_object` function.
 
-        :param filename: the filename of the config.  This can either be an
-                         absolute filename or a filename relative to the
-                         root path.
+        :param filename: the absolute filename of the config.
         :param silent: set to `True` if you want silent failure for missing
                        files.
         """
-        filename = os.path.join(self.root_path, filename)
         d = imp.new_module('config')
         d.__file__ = filename
         try:
