@@ -40,9 +40,13 @@ where ``backoffice`` or ``frontoffice`` is your application.
     setup (
         # ...
         entry_points = {
+            'settings_frontoffice': [
+                'default = path.to.package.of.frontoffice.default_settings:generate_config',
+                'local= path.to.package.of.frontoffice.local_settings:generate_config',
+            ],
             'settings_backoffice': [
-                'default = path.to.package.of.default_settings:generate_config',
-                'local= path.to.package.of.local_settings:generate_config',
+                'default = path.to.package.of.backoffice.default_settings:generate_config',
+                'local= path.to.package.of.backoffice.local_settings:generate_config',
             ]
         }
         # ...
@@ -62,7 +66,6 @@ The ``generate_config`` function should return instance of ``settei.config.Confi
         # adding some settings
         config['QUESTION'] = 'The Ultimate Question of Life, the Universe, and Everything'
         config['ANSWER'] = 41
-
 
         # or loading them from object
         config.from_pyfile('full/path/to/file.py')
@@ -103,11 +106,11 @@ application.
 
     from settei import get_config
 
-    # get config settings for frontoffice application and dev environment
-    config = get_config('frontoffice', 'dev')
+    # get config settings for frontoffice application and local environment
+    config = get_config('frontoffice', 'local')
 
-    # get config settings for backoffice application and staging environment
-    config = get_config('backoffice', 'staging')
+    # get config settings for backoffice application and local environment
+    config = get_config('backoffice', 'local')
 
     # now you can use it as you want
     DEBUG = config['DEBUG']
