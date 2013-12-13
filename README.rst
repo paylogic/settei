@@ -41,7 +41,8 @@ where ``backoffice`` or ``frontoffice`` is your application.
         # ...
         entry_points = {
             'settings_backoffice': [
-                'default = path.to.package.of.settings:generate_config',
+                'default = path.to.package.of.default_settings:generate_config',
+                'local= path.to.package.of.local_settings:generate_config',
             ]
         }
         # ...
@@ -51,11 +52,17 @@ The ``generate_config`` function should return instance of ``settei.config.Confi
 
 .. code-block:: python
 
+    # default_settings.py
+    from settei.config import Config
+
+
     def generate_config():
         config = Config()
 
         # adding some settings
-        config['ANSWER'] = 42
+        config['QUESTION'] = 'The Ultimate Question of Life, the Universe, and Everything'
+        config['ANSWER'] = 41
+
 
         # or loading them from object
         config.from_pyfile('full/path/to/file.py')
@@ -65,9 +72,32 @@ The ``generate_config`` function should return instance of ``settei.config.Confi
 
         return config
 
+You can also do inheriting one settings by others but only inside group of entry points, e.g if you want to inherit
+default settings by local settings you just should mention name of entry point which you want to inherit
+
+.. code-block:: python
+
+    # in your local_settings.py file
+    def generate_config(default):
+
+        # changing settings, the right answer is 42
+        default['ANSWER'] = 42
+
+        return default
+
+And if in your code you will get local settings and check them
+
+.. code-block:: python
+
+    >> from settei import get_config
+    >> config = get_config('frontoffice', 'local')
+    >> print config['QUESTION']
+    The Ultimate Question of Life, the Universe, and Everything
+    >> print config['ANSWER']
+    42
+
 Then you will need to install your package and after it with ``settei`` you will be able to get config settings for your
 application.
-
 
 .. code-block:: python
 
@@ -77,13 +107,10 @@ application.
     config = get_config('frontoffice', 'dev')
 
     # get config settings for backoffice application and staging environment
-    config = get_config('frontoffice', 'dev')
+    config = get_config('backoffice', 'staging')
 
-    # your config can be any structure which you want
+    # now you can use it as you want
     DEBUG = config['DEBUG']
-
-    # or even
-    DEBUG = config.DEBUG
 
 .. code-block:: bash
 
