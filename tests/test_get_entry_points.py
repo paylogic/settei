@@ -9,7 +9,9 @@ from settei import (
     EnvironmentNotSpecified,
     MoreThanOneDependencyInjection,
     _config_storage,
-    EnvironmentIsMissing, WrongConfigTypeError)
+    EnvironmentIsMissing,
+    WrongConfigTypeError
+)
 from settei.config import Config, ImportStringError
 
 # used for checking loading setting by from_envvar and from_pyfile
@@ -87,7 +89,8 @@ def get_entry_points(group, name=None):
         pkg_resources.EntryPoint.parse(
             'settings_from_object_with_path_to_object = '
             'tests.test_get_entry_points:settings_from_object_with_path_to_object'
-        ),pkg_resources.EntryPoint.parse(
+        ),
+        pkg_resources.EntryPoint.parse(
             'settings_from_object_with_invalid_path_to_object = '
             'tests.test_get_entry_points:settings_from_object_with_invalid_path_to_object'
         ),
