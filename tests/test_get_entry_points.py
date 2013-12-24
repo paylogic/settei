@@ -8,11 +8,11 @@ from settei import (
     DuplicateEntryPoint,
     EnvironmentNotSpecified,
     MoreThanOneDependencyInjection,
-    _config_storage,
     EnvironmentIsMissing,
-    WrongConfigTypeError
-)
-from settei.config import Config, ImportStringError
+    WrongConfigTypeError,
+    config_storage)
+
+from settei import config
 
 # used for checking loading setting by from_envvar and from_pyfile
 TEST_KEY = 'foo'
@@ -26,9 +26,9 @@ class SettingsHandler(object):
 
 def default():
     """Function which is used by entry points for getting settings for default environment."""
-    config = Config()
-    config.update({'QUESTION': 'The Ultimate Question of Life, the Universe, and Everything'})
-    return config
+    settings = config.Config()
+    settings.update({'QUESTION': 'The Ultimate Question of Life, the Universe, and Everything'})
+    return settings
 
 
 def dev(default):
@@ -55,7 +55,8 @@ def settings_from_object_with_path_to_object(default):
 
 
 def settings_from_object_with_invalid_path_to_object(default):
-    """Function which is used by entry points for getting settings from object with invalid path to object."""
+    """Function which is used by entry points for getting settings from object with invalid path to object.
+    When we will try to get this settings then ImportStringError exception should be raised."""
     default.from_object('tests.test_get_entry_points.SuperSettingsHandler')
     return default
 
@@ -68,7 +69,8 @@ def settings_from_envvar(default):
 
 
 def settings_from_invalid_path(default):
-    """Function which is used by entry points for gettings settings from invalid path."""
+    """Function which is used by entry points for gettings settings from invalid path.
+    When we will try to get this settings then IOError exception should be raised."""
     os.environ['path_to_object'] = 'tests/test_entry_points.py'
     default.from_envvar('path_to_object')
     return default
@@ -122,7 +124,7 @@ def config_environment():
 @pytest.fixture
 def clean_config():
     """Cleaning config for tests."""
-    _config_storage.clear()
+    config_storage.clear()
 
 
 @pytest.fixture
@@ -209,7 +211,7 @@ def test_loading_settings_from_object_with_path_to_object(monkeypatch_pkg_resour
 def test_loading_settings_from_object_with_invalid_path_to_object(monkeypatch_pkg_resources):
     """Check that ImportStringError will raise."""
 
-    with pytest.raises(ImportStringError):
+    with pytest.raises(config.ImportStringError):
         get_config('application', 'settings_from_object_with_invalid_path_to_object')
 
 

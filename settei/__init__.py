@@ -44,14 +44,13 @@ class EnvironmentNotSpecified(Exception):
 
 
 class EnvironmentIsMissing(Exception):
-    """Raises if environment is missing."""
-    message = "Environment is missing."
+    """Environment is missing."""
 
     def __str__(self):
         return unicode(self).encode('utf-8')
 
     def __unicode__(self):
-        return self.message
+        return self.__class__.__doc__
 
 
 class MoreThanOneDependencyInjection(Exception):
@@ -140,7 +139,7 @@ class ConfigStorage(dict):
         config = self[key] = ConfigGenerator(*key).get_config()
         return config
 
-_config_storage = ConfigStorage()
+config_storage = ConfigStorage()
 
 
 def get_config(application, environment=None):
@@ -156,4 +155,4 @@ def get_config(application, environment=None):
     if not environment:
         raise EnvironmentNotSpecified()
 
-    return _config_storage.__getitem__(application, environment)
+    return config_storage.__getitem__(application, environment)
