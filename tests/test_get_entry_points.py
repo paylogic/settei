@@ -223,7 +223,7 @@ def test_loading_settings_from_object_with_invalid_path_to_object(monkeypatch_pk
     """Check that ImportStringError will raise."""
 
     with pytest.raises(config.ImportStringError):
-       settei.get_config('application', 'settings_from_object_with_invalid_path_to_object')
+        settei.get_config('application', 'settings_from_object_with_invalid_path_to_object')
 
 
 def test_loading_settings_from_envvar(monkeypatch_pkg_resources):
