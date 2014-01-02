@@ -43,6 +43,16 @@ class EnvironmentNotSpecified(Exception):
         return self.message
 
 
+class EnvironmentIsMissing(Exception):
+    """Environment is missing."""
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+    def __unicode__(self):
+        return self.__class__.__doc__
+
+
 class MoreThanOneDependencyInjection(Exception):
     """Raises if entry point has more than one dependency injection."""
     message = "You specified more than one dependency injection."
@@ -113,7 +123,7 @@ class ConfigGenerator(object):
         try:
             entry_point = self.get_entry_points()[self.environment]
         except KeyError:
-            raise EnvironmentNotSpecified()
+            raise EnvironmentIsMissing()
 
         return self.invoke_entry_point(entry_point, *tuple(
             self.evaluate_dependency_injection(inspect.getargspec(entry_point.load()).args)
@@ -129,7 +139,7 @@ class ConfigStorage(dict):
         config = self[key] = ConfigGenerator(*key).get_config()
         return config
 
-_config_storage = ConfigStorage()
+config_storage = ConfigStorage()
 
 
 def get_config(application, environment=None):
@@ -145,4 +155,4 @@ def get_config(application, environment=None):
     if not environment:
         raise EnvironmentNotSpecified()
 
-    return _config_storage.__getitem__(application, environment)
+    return config_storage.__getitem__(application, environment)
