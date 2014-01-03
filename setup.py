@@ -29,7 +29,7 @@ for text_file in ['README.rst', 'CHANGES.rst']:
 
 setup(
     name='settei',
-    version='0.1',
+    version='0.2',
     description='Config system which based on setuptools\' entry points.',
     long_description='\n'.join(long_description),
     author='Paylogic International',
