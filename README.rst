@@ -19,6 +19,7 @@ Introduces terms ``application`` and ``environment``:
 .. image:: https://coveralls.io/repos/paylogic/settei/badge.png?branch=master
    :target: https://coveralls.io/r/paylogic/settei
 
+
 Installation
 ------------
 
@@ -136,6 +137,7 @@ Contact
 
 If you have questions, bug reports, suggestions, etc. please create an issue on
 the `GitHub project page <http://github.com/paylogic/settei>`_.
+
 
 License
 -------
