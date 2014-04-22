@@ -3,9 +3,9 @@ import imp
 import errno
 import sys
 
-PY2 = sys.version_info[0] == 2
+is_python2 = sys.version_info[0] == 2
 
-if not PY2:
+if not is_python2:
     string_types = (str,)
 
     def reraise(tp, value, tb=None):
@@ -21,10 +21,11 @@ else:
 class ImportStringError(ImportError):
     """Provides information about a failed :func:`import_string` attempt."""
 
-    #: String in dotted notation that failed to be imported.
     import_name = None
-    #: Wrapped exception.
+    """String in dotted notation that failed to be imported."""
+
     exception = None
+    """Wrapped exception."""
 
     def __init__(self, import_name, exception):
         self.import_name = import_name
@@ -61,6 +62,19 @@ class ImportStringError(ImportError):
                                  self.exception)
 
 
+def import_module(module, obj):
+    """Trying to import module."""
+
+    try:
+        return getattr(__import__(module, None, None, [obj]), obj)
+    except (ImportError, AttributeError):
+        # support importing modules not yet set up by the parent module
+        # (or package for that matter)
+        modname = module + '.' + obj
+        __import__(modname)
+        return sys.modules[modname]
+
+
 def import_string(import_name, silent=False):
     """Imports an object based on a string.  This is useful if you want to
     use import paths as endpoints or something similar.  An import path can
@@ -74,7 +88,7 @@ def import_string(import_name, silent=False):
                    `None` is returned instead.
     :return: imported object
     """
-    #XXX: py3 review needed
+    # TODO: py3 review needed
     assert isinstance(import_name, string_types)
     # force the import name to automatically convert to strings
     import_name = str(import_name)
@@ -87,16 +101,11 @@ def import_string(import_name, silent=False):
             return __import__(import_name)
         # __import__ is not able to handle unicode strings in the fromlist
         # if the module is a package
-        if PY2 and isinstance(obj, unicode):
+        if is_python2 and isinstance(obj, unicode):
             obj = obj.encode('utf-8')
-        try:
-            return getattr(__import__(module, None, None, [obj]), obj)
-        except (ImportError, AttributeError):
-            # support importing modules not yet set up by the parent module
-            # (or package for that matter)
-            modname = module + '.' + obj
-            __import__(modname)
-            return sys.modules[modname]
+
+        import_module(module, obj)
+
     except ImportError as e:
         if not silent:
             reraise(
@@ -126,8 +135,8 @@ class Config(dict):
                        files.
         :return: bool. `True` if able to load config, `False` otherwise.
         """
-        rv = os.environ.get(variable_name)
-        if not rv:
+        env_var = os.environ.get(variable_name)
+        if not env_var:
             if silent:
                 return False
             raise RuntimeError('The environment variable %r is not set '
@@ -135,7 +144,7 @@ class Config(dict):
                                'loaded.  Set this variable and make it '
                                'point to a configuration file' %
                                variable_name)
-        return self.from_pyfile(rv, silent=silent)
+        return self.from_pyfile(env_var, silent=silent)
 
     def from_pyfile(self, filename, silent=False):
         """Updates the values in the config from a Python file.  This function

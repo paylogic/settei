@@ -1,7 +1,7 @@
 """
 Settei
 
-Config system which bases on entry points of setuptools.
+Config system which based upon entry points of setuptools.
 """
 import inspect
 import os
@@ -11,7 +11,7 @@ from . import config
 
 
 class WrongConfigTypeError(Exception):
-    """Raises if list of entry points has duplicates."""
+    """Raised when list of entry points has duplicates."""
     message = "You should return instance of Config class from settei.config"
 
     def __str__(self):
@@ -34,7 +34,7 @@ class DuplicateEntryPoint(Exception):
 
 class EnvironmentNotSpecified(Exception):
     """Raises if environment is not specified."""
-    message = "You forget to specify environment."
+    message = "You forgot to specify environment."
 
     def __str__(self):
         return unicode(self).encode('utf-8')
