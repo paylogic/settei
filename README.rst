@@ -7,9 +7,9 @@ Generic purpose python settings library which uses entry points as a registry.
 
 Introduces terms ``application`` and ``environment``:
 
-- ``application`` is part of group's name in which you are storing entry points
+- ``application`` is part of group's name in which you are storing entry points.
 
-- ``environment`` is name of entry point
+- ``environment`` is name of entry point.
 
 
 .. image:: https://api.travis-ci.org/paylogic/settei.png
