@@ -97,9 +97,10 @@ In order to use the settings of our package, we need to first install it using
 :code:`python setup.py install` and make sure that it is in our path. We can then
 read and use settings in the rest of our package
 by using the :code:`get_config` function. Note that in :code:`get_config`
-function we specify the application name and not the group name. For example,
-if we want to load settings for the application :code:`application1` and we have
-defined a group of environments with the name :code:`settings_application1`,
+function we specify the application name and not the group name.
+
+For example, if we want to load settings for the application :code:`application1`
+and we have defined a group of environments with the name :code:`settings_application1`,
 then in the :code:`get_config` function we just use the name of the application,
 which in this case is :code:`application1`.
 
