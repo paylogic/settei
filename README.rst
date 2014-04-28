@@ -1,16 +1,16 @@
-Settei: Config system which bases on entry points of setuptools
-===============================================================
+Settei
+######
 
-The ``settei`` package is a library which gives you possibility to get config settings from entry points for
-specific application and environment.
-Generic purpose python settings library which uses entry points as a registry.
+:code:`settei` is a generic purpose python settings library based on the concept of
+entry points as a registry, inspired by
+`setuptools <http://pythonhosted.org/setuptools/pkg_resources.html#entry-points>`_.
 
-Introduces terms ``application`` and ``environment``:
+It introduces terms ``environment``, ``group``, and ``application``:
 
-- ``application`` is part of group's name in which you are storing entry points.
-
-- ``environment`` is name of entry point.
-
+* **environment** is the name of an entry point
+* **group** is a group of defined environments
+* **application** is part of a group's name and refers to the application to which
+  settings apply
 
 .. image:: https://api.travis-ci.org/paylogic/settei.png
    :target: https://travis-ci.org/paylogic/settei
@@ -19,118 +19,184 @@ Introduces terms ``application`` and ``environment``:
 .. image:: https://coveralls.io/repos/paylogic/settei/badge.png?branch=master
    :target: https://coveralls.io/r/paylogic/settei
 
+A minimal app that illustrates the use of `settei` can be found
+`here <https://github.com/paylogic/settei-example>`_.
 
 Installation
-------------
+============
 
 .. sourcecode::
 
     pip install settei
 
-
 Usage
------
+=====
 
-First of all you need to create entry points and put them into group, group comprises from two parts first of them is prefix
-``settings_`` and second one is name of your application, e.g. ``settings_backoffice`` or ``settings_frontoffice``
-where ``backoffice`` or ``frontoffice`` is your application.
+Define groups and environments
+------------------------------
+
+:code:`settei` can be configured and used in a series of simple steps.
+
+As a first step, we need to define environments and put them into groups. We are
+free to choose the name of the function to be used as an entry point. In this case,
+we chose the name :code:`generate_config`. Let's assume that our package contains
+two applications.
 
 .. code-block:: python
 
-    # in your setup.py
+    # package/setup.py
     setup (
         # ...
         entry_points = {
-            'settings_frontoffice': [
-                'default = path.to.package.of.frontoffice.default_settings:generate_config',
-                'local= path.to.package.of.frontoffice.local_settings:generate_config',
+            'settings_application1': [
+                'default = path.to.application1.default_settings:generate_config',
+                'local = path.to.application1.local_settings:generate_config',
             ],
-            'settings_backoffice': [
-                'default = path.to.package.of.backoffice.default_settings:generate_config',
-                'local= path.to.package.of.backoffice.local_settings:generate_config',
+            'settings_application2': [
+                'default = path.to.application2.default_settings:generate_config',
+                'local = path.to.application2.local_settings:generate_config',
             ]
         }
         # ...
     )
 
-The ``generate_config`` function should return instance of ``settei.config.Config`` class.
+Create settings
+---------------
+
+To create settings, we need an instance of the :code:`Config` class.
+In the following example, we are using the function named :code:`generate_config`,
+which we specified as an entry point when we defined the groups and environments.
+The :code:`generate_config` function, in our case, returns an instance of the
+:code:`Config` class. Settings can be created either directly,
+read them from a python file, or from an object.
 
 .. code-block:: python
 
-    # default_settings.py
+    # package/application1/default_settings.py
     from settei.config import Config
-
 
     def generate_config():
         config = Config()
 
-        # adding some settings
+        # create settings directly
         config['QUESTION'] = 'The Ultimate Question of Life, the Universe, and Everything'
         config['ANSWER'] = 41
 
-        # or loading them from object
+        # or load them from a file
         config.from_pyfile('full/path/to/file.py')
 
-        # or from object
+        # or from an object
         config.from_object('path.to.object')
 
         return config
 
-You can also do inheriting one settings by others but only inside group of entry points, e.g if you want to inherit
-default settings by local settings you just should mention name of entry point which you want to inherit
+Read settings
+-------------
+
+In order to use the settings of our package, we need to first install it using
+:code:`python setup.py install` and make sure that it is in out path. We can then
+read and use settings in the rest of our package
+by using the :code:`get_config` function. Note that in :code:`get_config`
+function we specify the application name and not the group name. For example,
+if we want to load settings for the application :code:`application1` and we have
+defined a group of environments with the name :code:`settings_application1`,
+then in the :code:`get_config` function we just use the name of the application,
+which in this case is :code:`application1`.
 
 .. code-block:: python
 
-    # in your local_settings.py file
+    from settei import get_config
+
+    # get config settings for 'applicaion1' application and 'local' environment
+    config = get_config('application1', 'local')
+
+    # get config settings for 'application2' application and 'local' environment
+    config = get_config('application2', 'local')
+
+    # now you can use it as you want
+    DEBUG = config['DEBUG']
+
+Another way to define the desired environment is using the :code:`CONFIG_ENVIRONMENT`
+variable.
+
+.. code-block:: bash
+
+    # run in this way
+    $ ENV CONFIG_ENVIRONMENT='dev' python my_incredible_script.py
+
+Then, in ``my_incredible_script.py`` when the :code:`get_config` function is
+used, we do not need to specify an environment as it will use the :code:`dev`
+environment that is defined by :code:`CONFIG_ENVIRONMENT`.
+
+.. code-block:: python
+
+    # and in my_incredible_script.py we can use get_config
+    from settei import get_config
+
+    # get config settings for 'application1' application and 'dev' environment,
+    # which has been specified when running my_incredible_script.py
+    config = get_config('application1')
+
+Settings inheritance
+--------------------
+
+Settings can also inherit other settings. However, this is only possible
+for settings that belong to the same group of environments. For instance, if
+you want your :code:`local` settings to inherit the :code:`default` settings,
+then in the :code:`generate_config` function you should mention the name of
+environment from which you want to inherit.
+
+.. code-block:: python
+
+    # in your application1/local_settings.py file
+    # 'default' is the environment from which we want to inherit settings
     def generate_config(default):
 
-        # changing settings, the right answer is 42
+        # change a setting, the right answer is 42
         default['ANSWER'] = 42
 
         return default
 
-And if in your code you will get local settings and check them
+If we read the :code:`local` settings, then we will see that
+:code:`config['ANSWER']` setting returns the value defined in
+:code:`local_settings.py`, as we would expect.
 
-.. code-block:: python
+.. code-block:: bash
 
     >> from settei import get_config
-    >> config = get_config('frontoffice', 'local')
+    >> config = get_config('application1', 'local')
     >> print config['QUESTION']
     The Ultimate Question of Life, the Universe, and Everything
     >> print config['ANSWER']
     42
 
-Then you will need to install your package and after it with ``settei`` you will be able to get config settings for your
-application.
+Inheriting other settings does not stop us from introducing additional ones.
+Attention should be paid though as new settings could be overwritten by any
+inherited ones with the same name.
 
 .. code-block:: python
 
-    from settei import get_config
+    # in your package/application1/local_settings.py file
+    from settei.config import Config
 
-    # get config settings for frontoffice application and local environment
-    config = get_config('frontoffice', 'local')
+    def generate_config(default):
+        local = Config()
 
-    # get config settings for backoffice application and local environment
-    config = get_config('backoffice', 'local')
+        # change a setting, the right answer is 42
+        default['ANSWER'] = 42
 
-    # now you can use it as you want
-    DEBUG = config['DEBUG']
+        # introduce an additional setting
+        local['NEW'] = 'A new setting'
 
-.. code-block:: bash
+        # this will be overwritten with the 'ANSWER' from the 'default' environment
+        local['ANSWER'] = 43
 
-    # you can also get environment from CONFIG_ENVIRONMENT
-    # just run your script/application in this way
-    $ ENV CONFIG_ENVIRONMENT='dev' python my_incredible_script.py
+        # update the 'local' settings with the 'default' settings
+        local.update(default)
 
+        # local['ANSWER'] will be 42 here again
 
-.. code-block:: python
-
-    # and in script you can use get_config like
-    from settei import get_config
-
-    # get config settings for frontoffice application and dev environment because we have already specified environment
-    config = get_config('frontoffice')
-
+        return local
 
 Contact
 -------
