@@ -94,7 +94,7 @@ Read settings
 -------------
 
 In order to use the settings of our package, we need to first install it using
-:code:`python setup.py install` and make sure that it is in out path. We can then
+:code:`python setup.py install` and make sure that it is in our path. We can then
 read and use settings in the rest of our package
 by using the :code:`get_config` function. Note that in :code:`get_config`
 function we specify the application name and not the group name. For example,
@@ -114,7 +114,7 @@ which in this case is :code:`application1`.
     config = get_config('application2', 'local')
 
     # now you can use it as you want
-    DEBUG = config['DEBUG']
+    DEBUG = config['QUESTION']
 
 Another way to define the desired environment is using the :code:`CONFIG_ENVIRONMENT`
 variable.
@@ -130,7 +130,7 @@ environment that is defined by :code:`CONFIG_ENVIRONMENT`.
 
 .. code-block:: python
 
-    # and in my_incredible_script.py we can use get_config
+    # in my_incredible_script.py we can use get_config
     from settei import get_config
 
     # get config settings for 'application1' application and 'dev' environment,
