@@ -120,7 +120,7 @@ application.
 
     # you can also get environment from CONFIG_ENVIRONMENT
     # just run your script/application in this way
-    $ ENV CONFIG_ENVIRONMENT='dev' python my_incredible_script.py
+    $ env CONFIG_ENVIRONMENT='dev' python my_incredible_script.py
 
 
 .. code-block:: python
